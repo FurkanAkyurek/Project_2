@@ -1,29 +1,30 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MovingCube : MonoBehaviour
 {
     public static MovingCube CurrentCube { get; private set; }
-    public static MovingCube LastCube { get; private set; }
+    public static GameObject LastCube { get; private set; }
+    public MoveDirection MoveDirection { get; set; }
+
+    [SerializeField] private float perfectComboValue;
 
     [SerializeField] private float moveSpeed = 1f;
 
     private void OnEnable()
     {
-        if(LastCube == null)
+        if (LastCube == null)
         {
-            LastCube = GameObject.Find("StartCube").GetComponent<MovingCube>();
-
-            LastCube.GetComponent<Renderer>().material.color = GetRandomColor();
+            LastCube = FindObjectOfType<StartCube>().gameObject;
         }
 
-        if (gameObject.CompareTag("MovingCube"))
-        {
-            CurrentCube = this;
+        CurrentCube = this;
 
-            GetComponent<Renderer>().material.color = GetRandomColor();
-        }
+        GetComponent<Renderer>().material.color = GetRandomColor();
+
+        transform.localScale = new Vector3(LastCube.transform.localScale.x, transform.localScale.y, LastCube.transform.localScale.z);
     }
 
     private Color GetRandomColor()
@@ -37,9 +38,35 @@ public class MovingCube : MonoBehaviour
 
         float hangover = transform.position.x - LastCube.transform.position.x;
 
+        if (Mathf.Abs(hangover) >= LastCube.transform.localScale.x)
+        {
+            LastCube = null;
+
+            CurrentCube = null;
+
+            GameManager.Instance.Failed();
+        }
+
+        if(Mathf.Abs(hangover) <= perfectComboValue)
+        {
+            GameManager.Instance.OnComboChanged?.Invoke(GameManager.Instance.combo);
+
+            GameManager.Instance.combo++;
+        }
+        else
+        {
+            GameManager.Instance.combo = 0;
+
+            GameManager.Instance.OnComboChanged?.Invoke(GameManager.Instance.combo);
+        }
+
         float direction = hangover > 0 ? 1f : -1f;
 
         SplitCubeOnX(hangover, direction);
+
+        LastCube = this.gameObject;
+
+        PlayerController.Instance.target = LastCube.transform;
     }
 
     private void SplitCubeOnX(float hangover, float direction)
@@ -57,12 +84,6 @@ public class MovingCube : MonoBehaviour
         float cubeEdge = transform.position.x + (newXSize / 2f * direction);
 
         float fallingBlockXPosition = cubeEdge + fallingBlockSize / 2f * direction;
-
-        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-
-        sphere.transform.position = new Vector3(cubeEdge, transform.position.y, transform.position.z);
-
-        sphere.transform.localScale = Vector3.one * 0.1f;
 
         SpawnDropCube(fallingBlockXPosition, fallingBlockSize);
     }
@@ -84,6 +105,13 @@ public class MovingCube : MonoBehaviour
 
     private void Update()
     {
-        transform.position += transform.right * Time.deltaTime * moveSpeed;
+        if(MoveDirection == MoveDirection.Left)
+        {
+            transform.position += transform.right * Time.deltaTime * moveSpeed;
+        }
+        else
+        {
+            transform.position += transform.right * -1 * Time.deltaTime * moveSpeed;
+        }
     }
 }
