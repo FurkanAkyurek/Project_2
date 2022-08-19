@@ -6,6 +6,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public Action<int> OnComboChanged;
+    public Action<int> OnCoinCollected;
 
     [SerializeField] private CubeSpawner[] spawners;
 
@@ -27,6 +28,8 @@ public class GameManager : MonoBehaviour
         Instance = this;
 
         OnComboChanged += PlayComboSound;
+
+        OnCoinCollected += CollectCoin;
     }
 
     private void Update()
@@ -38,6 +41,8 @@ public class GameManager : MonoBehaviour
                 if (MovingCube.CurrentCube != null)
                 {
                     MovingCube.CurrentCube.Stop();
+
+                    PlayerController.Instance.OnStateChanged?.Invoke(AnimationState.Run);
                 }
 
                 if (spawners.Length > spawnerIndex)
@@ -48,6 +53,10 @@ public class GameManager : MonoBehaviour
 
                     spawnerIndex++;
                 }
+                else if(spawners.Length < spawnerIndex - 1)
+                {
+                    PlayerController.Instance.target = FinishArea.Instance.finishRef;
+                }
             }
         }
     }
@@ -55,6 +64,11 @@ public class GameManager : MonoBehaviour
     public void PlayComboSound(int combo)
     {
         audioSource.PlayOneShot(comboSounds[combo]);
+    }
+
+    public void CollectCoin(int value)
+    {
+        PlayerPrefs.SetInt("Coin", PlayerPrefs.GetInt("Coin") + value);
     }
 
     public void Failed()

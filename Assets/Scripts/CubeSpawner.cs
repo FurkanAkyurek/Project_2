@@ -21,7 +21,6 @@ public class CubeSpawner : MonoBehaviour
 
         cube.MoveDirection = moveDirection;
     }
-
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
