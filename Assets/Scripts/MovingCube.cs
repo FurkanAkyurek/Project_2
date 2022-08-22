@@ -45,6 +45,8 @@ public class MovingCube : MonoBehaviour
             CurrentCube = null;
 
             GameManager.Instance.Failed();
+
+            return;
         }
 
         if(Mathf.Abs(hangover) <= perfectComboValue)
@@ -61,7 +63,7 @@ public class MovingCube : MonoBehaviour
         }
 
         float direction = hangover > 0 ? 1f : -1f;
-
+        
         SplitCubeOnX(hangover, direction);
 
         LastCube = this.gameObject;

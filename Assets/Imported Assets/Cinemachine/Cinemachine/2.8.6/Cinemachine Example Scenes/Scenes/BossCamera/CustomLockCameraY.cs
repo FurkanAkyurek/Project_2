@@ -1,12 +1,10 @@
 using UnityEngine;
 using Cinemachine;
+using DG.Tweening;
 
-/// <summary>
-/// An add-on module for Cinemachine Virtual Camera that locks the camera's Y co-ordinate
-/// </summary>
 [ExecuteAlways]
 [SaveDuringPlay]
-[AddComponentMenu("")] // Hide in menu
+[AddComponentMenu("")]
 public class CustomLockCameraY : CinemachineExtension
 {
     [Tooltip("Lock the camera's Y position to this value")]

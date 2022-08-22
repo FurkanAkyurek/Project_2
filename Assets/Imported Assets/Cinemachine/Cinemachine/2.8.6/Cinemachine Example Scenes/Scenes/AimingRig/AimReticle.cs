@@ -2,9 +2,9 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Reticle control for when the aiming is inaccurate. Inaccuracy is shown by pulling apart the aim reticle.
-/// </summary>
+
+// Reticle control for when the aiming is inaccurate. Inaccuracy is shown by pulling apart the aim reticle.
+
 public class AimReticle : MonoBehaviour
 {
     [Tooltip("Maximum radius of the aim reticle, when aiming is inaccurate. ")]
